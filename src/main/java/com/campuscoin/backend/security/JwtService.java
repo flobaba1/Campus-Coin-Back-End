@@ -23,7 +23,7 @@ public class JwtService {
             @Value("${USER_JWT_SECRET}") String userSecret,
             @Value("${ADMIN_JWT_SECRET}") String adminSecret,
             @Value("${USER_JWT_EXPIRATION:900000}") long userExpiration,
-            @Value("${ADMIN_JWT_SECRET:900000}") long adminExpiration
+            @Value("${ADMIN_JWT_EXPIRATION:900000}") long adminExpiration
     ) {
         this.userSecret = userSecret;
         this.adminSecret = adminSecret;
