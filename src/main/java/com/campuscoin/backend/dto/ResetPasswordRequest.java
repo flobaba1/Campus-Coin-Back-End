@@ -4,26 +4,43 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class ResetPasswordRequest {
-    @NotBlank
-    private String token;
 
-    @NotBlank
-    @Size(min = 8)
+    @NotBlank(message = "OTP code is required")
+    private String otpCode;
+
+    @NotBlank(message = "OTP Id is missing")
+    private String otpId;
+
+    @NotBlank(message = "New password is required")
+    @Size(
+            min = 8,
+            message = "Password must be at least 8 characters"
+    )
     private String newPassword;
 
-    public String getToken(){
-        return token;
+    // getters and setters
+
+    public String getOtpCode() {
+        return otpCode;
     }
 
-    public void setToken(String token){
-        this.token = token;
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
     }
 
-    public String getNewPassword(){
+    public String getNewPassword() {
         return newPassword;
     }
 
-    public void setNewPassword(String newPassword){
+    public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public String getOtpId() {
+        return otpId;
+    }
+
+    public void setOtpId(String otpId) {
+        this.otpId = otpId;
     }
 }

@@ -62,6 +62,14 @@ public class User {
     private BigDecimal monthlySavingsGoal = BigDecimal.ZERO;
 
     @Column(
+            name = "monthly_income",
+            nullable = false,
+            precision = 15,
+            scale = 2
+    )
+    private BigDecimal monthlyIncome = BigDecimal.ZERO;
+
+    @Column(
             name = "created_at",
             nullable = false,
             updatable = false
@@ -156,5 +164,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public BigDecimal getMonthlyIncome() {
+        return monthlyIncome;
+    }
+
+    public void setMonthlyIncome(BigDecimal monthlyIncome) {
+        this.monthlyIncome = monthlyIncome;
     }
 }

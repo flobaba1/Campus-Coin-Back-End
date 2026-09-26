@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,15 +31,31 @@ public class AuthController {
         return authService.login(request);
     }
 
+    @PostMapping("/create-admin")
+    public boolean createAdmin(@Valid @RequestBody LoginRequest request){
+        return authService.createAdmin(request);
+    }
+
     @PostMapping("/forgot-password")
-    public String forgotPassword(@Valid @RequestBody ForgotPasswordRequest request){
-        authService.forgotPassword(request.getEmail());
-        return "Password reset link generated";
+    public Map<String, String> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+
+        String otpId = authService.forgotPassword(
+                request.getEmail()
+        );
+
+        return Map.of("otpId", otpId, "message", "One time password sent to email");
+    }
+
+    @PostMapping("/admin-login")
+    public LoginResponse adminLogin(@Valid @RequestBody LoginRequest request){
+        return authService.adminLogin(request);
     }
 
     @PostMapping("/reset-password")
     public String resetPassword(@Valid @RequestBody ResetPasswordRequest request){
-        authService.resetPassword(request.getToken(),
+        authService.resetPassword(request.getOtpId(), request.getOtpCode(),
                 request.getNewPassword());
         return "Password reset successful";
     }

@@ -1,5 +1,6 @@
 package com.campuscoin.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -20,6 +21,7 @@ public class Admin {
     )
     private String adminId;
 
+    @JsonIgnore
     @Column(
             name = "password_hash",
             nullable = false,

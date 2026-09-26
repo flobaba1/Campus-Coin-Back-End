@@ -1,5 +1,6 @@
 package com.campuscoin.backend.entity;
 
+import com.campuscoin.backend.enums.TransactionType;
 import jakarta.persistence.*;
 
 @Entity
