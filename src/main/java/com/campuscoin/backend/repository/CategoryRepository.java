@@ -14,6 +14,8 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
     List<Category> findByDefaultCategoryTrueOrCreatedBy(String createdBy);
 
+    Optional<Category> findByCategoryIdAndDefaultCategoryTrue(String categoryId);
+
     Optional<Category> findByCategoryIdAndCreatedBy(
             String categoryId,
             String createdBy
