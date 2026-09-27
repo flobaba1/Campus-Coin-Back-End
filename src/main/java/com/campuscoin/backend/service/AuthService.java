@@ -86,6 +86,9 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
+        user.setLastVisited(LocalDateTime.now());
+        userRepository.save(user);
+
         String token  = jwtService.generateToken(user);
         return new LoginResponse(token, user);
     }

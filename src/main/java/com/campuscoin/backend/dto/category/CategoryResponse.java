@@ -8,6 +8,7 @@ public class CategoryResponse {
     private String name;
     private TransactionType type;
     private boolean defaultCategory;
+    private int totalUsers;
 
     public CategoryResponse(
             String categoryId,
@@ -19,6 +20,20 @@ public class CategoryResponse {
         this.name = name;
         this.type = type;
         this.defaultCategory = defaultCategory;
+    }
+
+    public CategoryResponse(
+            String categoryId,
+            String name,
+            TransactionType type,
+            boolean defaultCategory,
+            int totalUsers
+    ) {
+        this.categoryId = categoryId;
+        this.name = name;
+        this.type = type;
+        this.defaultCategory = defaultCategory;
+        this.totalUsers = totalUsers;
     }
 
     public String getCategoryId() {
@@ -35,5 +50,13 @@ public class CategoryResponse {
 
     public boolean isDefaultCategory() {
         return defaultCategory;
+    }
+
+    public int getTotalUsers() {
+        return totalUsers;
+    }
+
+    public void setTotalUsers(int totalUsers) {
+        this.totalUsers = totalUsers;
     }
 }
