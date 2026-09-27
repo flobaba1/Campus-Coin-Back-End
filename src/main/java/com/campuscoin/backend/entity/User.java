@@ -76,6 +76,13 @@ public class User {
     )
     private LocalDateTime createdAt;
 
+    @Column(
+            name = "last_visited",
+            nullable = false,
+            updatable = false
+    )
+    private LocalDateTime lastVisited;
+
     protected User() {
     }
 
@@ -101,6 +108,10 @@ public class User {
 
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+
+        if (lastVisited == null) {
+            lastVisited = LocalDateTime.now();
         }
 
         if (monthlySavingsGoal == null) {
@@ -172,5 +183,13 @@ public class User {
 
     public void setMonthlyIncome(BigDecimal monthlyIncome) {
         this.monthlyIncome = monthlyIncome;
+    }
+
+    public LocalDateTime getLastVisited() {
+        return lastVisited;
+    }
+
+    public void setLastVisited(LocalDateTime lastVisited) {
+        this.lastVisited = lastVisited;
     }
 }

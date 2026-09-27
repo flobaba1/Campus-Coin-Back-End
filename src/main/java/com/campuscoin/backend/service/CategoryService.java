@@ -29,6 +29,16 @@ public class CategoryService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> getCategoriesForAdmin() {
+
+        return categoryRepository
+                .findByDefaultCategoryTrue()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     @Transactional
     public CategoryResponse createCategory(
             String userId,
@@ -51,6 +61,36 @@ public class CategoryService {
         category.setType(request.getType());
         category.setDefaultCategory(false);
         category.setCreatedBy(userId);
+        category.setTotalUser(1);
+
+        Category saved = categoryRepository.save(category);
+
+        return toResponse(saved);
+    }
+
+    @Transactional
+    public CategoryResponse createAdminCategory(
+            String userId,
+            CreateCategoryRequest request
+    ) {
+
+        String name = request.getName().trim();
+
+        if (categoryRepository.existsByNameIgnoreCaseAndDefaultCategoryTrue(name)
+                || categoryRepository.existsByNameIgnoreCaseAndCreatedBy(name, userId)) {
+
+            throw new IllegalArgumentException(
+                    "A category with this name already exists"
+            );
+        }
+
+        Category category = new Category();
+
+        category.setName(name);
+        category.setType(request.getType());
+        category.setDefaultCategory(true);
+        category.setCreatedBy(userId);
+        category.setTotalUser(0);
 
         Category saved = categoryRepository.save(category);
 
@@ -91,6 +131,38 @@ public class CategoryService {
     }
 
     @Transactional
+    public CategoryResponse updateAdminCategory(
+            String userId,
+            String categoryId,
+            UpdateCategoryRequest request
+    ) {
+
+        Category category = categoryRepository
+                .findByCategoryIdAndDefaultCategoryTrue(categoryId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Category not found"
+                        )
+                );
+
+        String name = request.getName().trim();
+
+        boolean duplicate =
+                categoryRepository.existsByNameIgnoreCaseAndDefaultCategoryTrue(name);
+
+        if (duplicate && !category.getName().equalsIgnoreCase(name)) {
+            throw new IllegalArgumentException(
+                    "A category with this name already exists"
+            );
+        }
+
+        category.setName(name);
+        category.setType(request.getType());
+
+        return toResponse(categoryRepository.save(category));
+    }
+
+    @Transactional
     public void deleteCategory(
             String userId,
             String categoryId
@@ -107,13 +179,35 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
+    @Transactional
+    public void deleteAdminCategory(
+            String userId,
+            String categoryId
+    ) {
+
+        Category category = categoryRepository
+                .findByCategoryIdAndDefaultCategoryTrue(categoryId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Category not found"
+                        )
+                );
+
+        if (category.getTotalUser() > 0){
+            throw new IllegalArgumentException("Category cannot be deleted, used by users");
+        }
+
+        categoryRepository.delete(category);
+    }
+
     private CategoryResponse toResponse(Category category) {
 
         return new CategoryResponse(
                 category.getCategoryId(),
                 category.getName(),
                 category.getType(),
-                category.isDefaultCategory()
+                category.isDefaultCategory(),
+                category.getTotalUser()
         );
     }
 }

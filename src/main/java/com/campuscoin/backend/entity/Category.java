@@ -42,6 +42,9 @@ public class Category {
     )
     private String createdBy;
 
+    @Column(name = "total_users", nullable = false)
+    private int totalUser = 0;
+
     @PrePersist
     protected void onCreate() {
         if (categoryId == null) {
@@ -89,5 +92,13 @@ public class Category {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public int getTotalUser() {
+        return totalUser;
+    }
+
+    public void setTotalUser(int totalUser) {
+        this.totalUser = totalUser;
     }
 }
