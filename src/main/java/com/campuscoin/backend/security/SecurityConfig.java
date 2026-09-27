@@ -43,6 +43,7 @@ public class SecurityConfig {
 
         http
                 .securityMatcher("/api/auth/**")
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth ->
                         auth.anyRequest().permitAll()
@@ -60,6 +61,7 @@ public class SecurityConfig {
 
         http
                 .securityMatcher("/api/admin/**")
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth ->
                         auth.anyRequest().authenticated()
@@ -81,6 +83,7 @@ public class SecurityConfig {
 
         http
                 .securityMatcher("/**")
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth ->
                         auth.anyRequest().authenticated()
