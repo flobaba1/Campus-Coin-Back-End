@@ -1,6 +1,6 @@
 package com.campuscoin.backend.dto.category;
 
-import com.campuscoin.backend.entity.TransactionType;
+import com.campuscoin.backend.enums.TransactionType;
 
 public class CategoryResponse {
 

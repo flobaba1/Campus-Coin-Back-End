@@ -1,7 +1,7 @@
 package com.campuscoin.backend.config;
 
 import com.campuscoin.backend.entity.Category;
-import com.campuscoin.backend.entity.TransactionType;
+import com.campuscoin.backend.enums.TransactionType;
 import com.campuscoin.backend.repository.CategoryRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -14,8 +14,11 @@ public class CategoryDataInitializer {
     CommandLineRunner initializeDefaultCategories(
             CategoryRepository categoryRepository
     ) {
-
         return args -> {
+
+            // =========================
+            // INCOME CATEGORIES
+            // =========================
 
             createIfMissing(
                     categoryRepository,
@@ -47,6 +50,11 @@ public class CategoryDataInitializer {
                     TransactionType.INCOME
             );
 
+
+            // =========================
+            // EXPENSE CATEGORIES
+            // =========================
+
             createIfMissing(
                     categoryRepository,
                     "Food",
@@ -61,13 +69,19 @@ public class CategoryDataInitializer {
 
             createIfMissing(
                     categoryRepository,
-                    "Education",
+                    "Hostel/Rent",
                     TransactionType.EXPENSE
             );
 
             createIfMissing(
                     categoryRepository,
-                    "Bills & Utilities",
+                    "Academics",
+                    TransactionType.EXPENSE
+            );
+
+            createIfMissing(
+                    categoryRepository,
+                    "Subscriptions",
                     TransactionType.EXPENSE
             );
 
@@ -79,31 +93,7 @@ public class CategoryDataInitializer {
 
             createIfMissing(
                     categoryRepository,
-                    "Personal Care",
-                    TransactionType.EXPENSE
-            );
-
-            createIfMissing(
-                    categoryRepository,
-                    "Shopping",
-                    TransactionType.EXPENSE
-            );
-
-            createIfMissing(
-                    categoryRepository,
-                    "Health",
-                    TransactionType.EXPENSE
-            );
-
-            createIfMissing(
-                    categoryRepository,
-                    "Savings",
-                    TransactionType.EXPENSE
-            );
-
-            createIfMissing(
-                    categoryRepository,
-                    "Other",
+                    "Miscellaneous",
                     TransactionType.EXPENSE
             );
         };
@@ -114,7 +104,6 @@ public class CategoryDataInitializer {
             String name,
             TransactionType type
     ) {
-
         if (!repository.existsByNameIgnoreCaseAndDefaultCategoryTrue(name)) {
 
             Category category = new Category();
