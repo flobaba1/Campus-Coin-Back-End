@@ -1,4 +1,4 @@
-package com.campuscoin.backend.entity;
+package com.campuscoin.backend.enums;
 
 public enum TransactionType {
 

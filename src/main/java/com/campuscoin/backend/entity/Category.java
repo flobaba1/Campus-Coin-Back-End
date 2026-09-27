@@ -1,5 +1,6 @@
 package com.campuscoin.backend.entity;
 
+import com.campuscoin.backend.enums.TransactionType;
 import jakarta.persistence.*;
 
 @Entity
@@ -40,6 +41,9 @@ public class Category {
             length = 36
     )
     private String createdBy;
+
+    @Column(name = "total_users", nullable = false)
+    private int totalUser = 0;
 
     @PrePersist
     protected void onCreate() {
@@ -88,5 +92,13 @@ public class Category {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public int getTotalUser() {
+        return totalUser;
+    }
+
+    public void setTotalUser(int totalUser) {
+        this.totalUser = totalUser;
     }
 }

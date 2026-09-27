@@ -1,5 +1,6 @@
 package com.campuscoin.backend.entity;
 
+import com.campuscoin.backend.enums.TransactionType;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;

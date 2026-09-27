@@ -37,6 +37,12 @@ public class SignupRequest {
     )
     private BigDecimal monthlySavingsGoal = BigDecimal.ZERO;
 
+    @DecimalMin(
+            value = "0.00",
+            message = "Savings goal cannot be negative"
+    )
+    private BigDecimal monthlyIncome = BigDecimal.ZERO;
+
     // Getters and Setters
 
     public String getName() {
@@ -77,5 +83,13 @@ public class SignupRequest {
 
     public void setMonthlySavingsGoal(BigDecimal monthlySavingsGoal) {
         this.monthlySavingsGoal = monthlySavingsGoal;
+    }
+
+    public BigDecimal getMonthlyIncome() {
+        return monthlyIncome;
+    }
+
+    public void setMonthlyIncome(BigDecimal monthlyIncome) {
+        this.monthlyIncome = monthlyIncome;
     }
 }
