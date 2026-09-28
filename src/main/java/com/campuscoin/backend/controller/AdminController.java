@@ -1,8 +1,13 @@
 package com.campuscoin.backend.controller;
 
+import com.campuscoin.backend.dto.CreateNotificationRequest;
+import com.campuscoin.backend.dto.NotificationResponse;
+import com.campuscoin.backend.dto.UpdateNotificationRequest;
+import com.campuscoin.backend.dto.UserResponse;
 import com.campuscoin.backend.dto.category.CategoryResponse;
 import com.campuscoin.backend.dto.category.CreateCategoryRequest;
 import com.campuscoin.backend.dto.category.UpdateCategoryRequest;
+import com.campuscoin.backend.service.AdminService;
 import com.campuscoin.backend.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,8 +23,11 @@ public class AdminController {
 
     private final CategoryService categoryService;
 
-    public AdminController(CategoryService categoryService) {
+    private final AdminService adminService;
+
+    public AdminController(CategoryService categoryService, AdminService adminService) {
         this.categoryService = categoryService;
+        this.adminService = adminService;
     }
 
     @GetMapping("/categories")
@@ -82,5 +90,66 @@ public class AdminController {
         );
 
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/notification")
+    public NotificationResponse createNotification(
+            @Valid @RequestBody CreateNotificationRequest request
+    ) {
+
+        return adminService.createNotification(request);
+    }
+
+    @GetMapping("/notification")
+    public List<NotificationResponse> getNotifications() {
+
+        return adminService.getNotifications();
+    }
+
+    @GetMapping("/notification/{notificationId}")
+    public NotificationResponse getNotification(
+            @PathVariable String notificationId
+    ) {
+
+        return adminService.getNotification(notificationId);
+    }
+
+    @PutMapping("/notification/{notificationId}")
+    public NotificationResponse updateNotification(
+            @PathVariable String notificationId,
+            @Valid @RequestBody UpdateNotificationRequest request
+    ) {
+
+        return adminService.updateNotification(
+                notificationId,
+                request
+        );
+    }
+
+    @DeleteMapping("/notification/{notificationId}")
+    public ResponseEntity<Void> deleteNotification(
+            @PathVariable String notificationId
+    ) {
+
+        adminService.deleteNotification(notificationId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/users/{userId}/suspend")
+    public ResponseEntity<Void> suspendUser(
+            @PathVariable String userId
+    ) {
+
+        adminService.suspendUser(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users")
+    public List<UserResponse> getAllUsers() {
+
+        return adminService.getAllUsers();
     }
 }
