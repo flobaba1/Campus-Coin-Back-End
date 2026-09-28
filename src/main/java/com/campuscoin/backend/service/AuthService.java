@@ -8,6 +8,7 @@ import com.campuscoin.backend.entity.Admin;
 import com.campuscoin.backend.entity.Otp;
 import com.campuscoin.backend.entity.User;
 import com.campuscoin.backend.enums.OtpPurpose;
+import com.campuscoin.backend.enums.UserStatus;
 import com.campuscoin.backend.repository.AdminRepository;
 import com.campuscoin.backend.repository.OtpRepository;
 import com.campuscoin.backend.repository.PasswordResetTokenRepository;
@@ -84,6 +85,12 @@ public class AuthService {
                 user.getPasswordHash()
         )){
             throw new RuntimeException("Invalid email or password");
+        }
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "User account is not active"
+            );
         }
 
         user.setLastVisited(LocalDateTime.now());
