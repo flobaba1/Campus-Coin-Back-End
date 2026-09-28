@@ -1,5 +1,6 @@
 package com.campuscoin.backend.entity;
 
+import com.campuscoin.backend.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -82,6 +83,13 @@ public class User {
             updatable = false
     )
     private LocalDateTime lastVisited;
+
+    @Enumerated(EnumType.STRING)
+    @Column(
+            name = "status",
+            nullable = false
+    )
+    private UserStatus status = UserStatus.ACTIVE;
 
     protected User() {
     }
@@ -191,5 +199,13 @@ public class User {
 
     public void setLastVisited(LocalDateTime lastVisited) {
         this.lastVisited = lastVisited;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 }
