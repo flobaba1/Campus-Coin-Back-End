@@ -11,7 +11,6 @@ import com.campuscoin.backend.enums.OtpPurpose;
 import com.campuscoin.backend.enums.UserStatus;
 import com.campuscoin.backend.repository.AdminRepository;
 import com.campuscoin.backend.repository.OtpRepository;
-import com.campuscoin.backend.repository.PasswordResetTokenRepository;
 import com.campuscoin.backend.repository.UserRepository;
 import com.campuscoin.backend.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,8 +32,7 @@ public class AuthService {
     private final OtpService otpService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
-                       PasswordResetTokenRepository tokenRepository, AdminRepository adminRepository,
-                        OtpRepository otpRepository, EmailService emailService, OtpService otpService) {
+                       AdminRepository adminRepository, OtpRepository otpRepository, EmailService emailService, OtpService otpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
