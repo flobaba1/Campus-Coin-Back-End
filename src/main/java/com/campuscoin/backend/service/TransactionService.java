@@ -6,12 +6,16 @@ import com.campuscoin.backend.dto.transaction.UpdateTransactionRequest;
 import com.campuscoin.backend.entity.Category;
 import com.campuscoin.backend.entity.Transaction;
 import com.campuscoin.backend.entity.User;
+import com.campuscoin.backend.enums.TransactionType;
 import com.campuscoin.backend.repository.CategoryRepository;
 import com.campuscoin.backend.repository.TransactionRepository;
 import com.campuscoin.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -53,7 +57,10 @@ public class TransactionService {
                 request.getCategoryId()
         );
 
-        validateCategoryType(category, request.getType());
+        validateCategoryType(
+                category,
+                request.getType()
+        );
 
         Transaction transaction = new Transaction();
 
@@ -61,7 +68,9 @@ public class TransactionService {
         transaction.setCategory(category);
         transaction.setAmount(request.getAmount());
         transaction.setType(request.getType());
-        transaction.setDescription(normalizeDescription(request.getDescription()));
+        transaction.setDescription(
+                normalizeDescription(request.getDescription())
+        );
         transaction.setDate(request.getDate());
 
         Transaction savedTransaction =
@@ -93,7 +102,10 @@ public class TransactionService {
                 request.getCategoryId()
         );
 
-        validateCategoryType(category, request.getType());
+        validateCategoryType(
+                category,
+                request.getType()
+        );
 
         transaction.setCategory(category);
         transaction.setAmount(request.getAmount());
@@ -161,7 +173,7 @@ public class TransactionService {
 
     private void validateCategoryType(
             Category category,
-            com.campuscoin.backend.enums.TransactionType transactionType
+            TransactionType transactionType
     ) {
 
         if (category.getType() != transactionType) {
@@ -180,5 +192,28 @@ public class TransactionService {
         String trimmed = description.trim();
 
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    public BigDecimal calculateSpent(
+            String userId,
+            String categoryId,
+            Integer year,
+            Integer month
+    ) {
+
+        LocalDate startDate = LocalDate.of(year, month, 1);
+
+        LocalDate endDate =
+                startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        return transactionRepository
+                .calculateSpent(
+                        userId,
+                        categoryId,
+                        TransactionType.EXPENSE,
+                        startDate,
+                        endDate
+                )
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }
