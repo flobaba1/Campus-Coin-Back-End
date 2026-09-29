@@ -33,7 +33,7 @@ public class AuthService {
     private final StudentActivityService studentActivityService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
-                       PasswordResetTokenRepository tokenRepository, AdminRepository adminRepository,
+                        AdminRepository adminRepository,
                         OtpRepository otpRepository, EmailService emailService, OtpService otpService, StudentActivityService studentActivityService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

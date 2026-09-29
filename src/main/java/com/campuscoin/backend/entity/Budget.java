@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -80,7 +79,7 @@ public class Budget {
     )
     private String userId;
 
-    protected Budget() {
+    public Budget() {
     }
 
 

@@ -4,13 +4,10 @@ import com.campuscoin.backend.dto.BudgetRequest;
 import com.campuscoin.backend.dto.BudgetResponse;
 import com.campuscoin.backend.entity.Budget;
 import com.campuscoin.backend.entity.Category;
-import com.campuscoin.backend.entity.Transaction;
-import com.campuscoin.backend.entity.User;
 import com.campuscoin.backend.enums.TransactionType;
 import com.campuscoin.backend.repository.BudgetRepository;
 import com.campuscoin.backend.repository.CategoryRepository;
 import com.campuscoin.backend.repository.TransactionRepository;
-import com.campuscoin.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -25,18 +22,15 @@ public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
 
     public BudgetService(
             BudgetRepository budgetRepository,
             CategoryRepository categoryRepository,
-            TransactionRepository transactionRepository,
-            UserRepository userRepository
+            TransactionRepository transactionRepository
     ) {
         this.budgetRepository = budgetRepository;
         this.categoryRepository = categoryRepository;
         this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
     }
 
     // =========================================================
@@ -47,7 +41,7 @@ public class BudgetService {
     public List<BudgetResponse> getBudgets(String userId) {
 
         List<Budget> budgets =
-                budgetRepository.findByUser_UserIdOrderByYearDescMonthDesc(
+                budgetRepository.findByUserIdOrderByYearDescMonthDesc(
                         userId
                 );
 
@@ -71,7 +65,7 @@ public class BudgetService {
 
         List<Budget> budgets =
                 budgetRepository
-                        .findByUser_UserIdAndYearAndMonthOrderByCategory_NameAsc(
+                        .findByUserIdAndYearAndMonthOrderByCategory_NameAsc(
                                 userId,
                                 year,
                                 month
@@ -97,11 +91,6 @@ public class BudgetService {
                 request.getMonth()
         );
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found")
-                );
-
         Category category = getAccessibleCategory(
                 request.getCategoryId(),
                 userId
@@ -111,7 +100,7 @@ public class BudgetService {
 
         boolean exists =
                 budgetRepository
-                        .existsByUser_UserIdAndCategory_CategoryIdAndMonthAndYear(
+                        .existsByUserIdAndCategory_CategoryIdAndMonthAndYear(
                                 userId,
                                 request.getCategoryId(),
                                 request.getMonth(),
@@ -126,13 +115,14 @@ public class BudgetService {
 
         Budget budget = new Budget();
 
-        budget.setUser(user);
+        budget.setUserId(userId);
         budget.setCategory(category);
         budget.setAmount(request.getAmount());
         budget.setMonth(request.getMonth());
         budget.setYear(request.getYear());
 
-        Budget savedBudget = budgetRepository.save(budget);
+        Budget savedBudget =
+                budgetRepository.save(budget);
 
         return toResponse(savedBudget, userId);
     }
@@ -155,7 +145,7 @@ public class BudgetService {
 
         Budget budget =
                 budgetRepository
-                        .findByBudgetIdAndUser_UserId(
+                        .findByBudgetIdAndUserId(
                                 budgetId,
                                 userId
                         )
@@ -178,14 +168,14 @@ public class BudgetService {
                         .equals(request.getCategoryId());
 
         boolean periodChanged =
-                !budget.getMonth().equals(request.getMonth())
-                        || !budget.getYear().equals(request.getYear());
+                budget.getMonth() != request.getMonth()
+                        || budget.getYear() != request.getYear();
 
         if (categoryChanged || periodChanged) {
 
             boolean exists =
                     budgetRepository
-                            .existsByUser_UserIdAndCategory_CategoryIdAndMonthAndYear(
+                            .existsByUserIdAndCategory_CategoryIdAndMonthAndYear(
                                     userId,
                                     request.getCategoryId(),
                                     request.getMonth(),
@@ -222,7 +212,7 @@ public class BudgetService {
 
         Budget budget =
                 budgetRepository
-                        .findByBudgetIdAndUser_UserId(
+                        .findByBudgetIdAndUserId(
                                 budgetId,
                                 userId
                         )
@@ -309,42 +299,18 @@ public class BudgetService {
             Integer month
     ) {
 
-        LocalDate startDate =
-                LocalDate.of(
-                        year,
-                        month,
-                        1
-                );
+        LocalDate startDate = LocalDate.of(year, month, 1);
 
         LocalDate endDate =
-                startDate.withDayOfMonth(
-                        startDate.lengthOfMonth()
-                );
+                startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-        List<Transaction> transactions =
-                transactionRepository
-                        .findByUser_UserIdAndTypeAndDateBetweenOrderByDateDescCreatedAtDesc(
-                                userId,
-                                TransactionType.EXPENSE,
-                                startDate,
-                                endDate
-                        );
-
-        return transactions.stream()
-                .filter(transaction ->
-                        transaction.getCategory()
-                                .getCategoryId()
-                                .equals(categoryId)
-                )
-                .map(Transaction::getAmount)
-                .reduce(
-                        BigDecimal.ZERO,
-                        BigDecimal::add
-                )
-                .setScale(
-                        2,
-                        RoundingMode.HALF_UP
-                );
+        return transactionRepository.calculateSpent(
+                userId,
+                categoryId,
+                TransactionType.EXPENSE,
+                startDate,
+                endDate
+        ).setScale(2, RoundingMode.HALF_UP);
     }
 
     // =========================================================
