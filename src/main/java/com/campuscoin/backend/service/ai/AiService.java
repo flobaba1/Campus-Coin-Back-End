@@ -27,7 +27,7 @@ public class AiService {
                     .content();
 
         } catch (Exception e) {
-            log.error("Gemini request failed", e);
+            log.error("AI request failed", e);
             throw e;
         }
 

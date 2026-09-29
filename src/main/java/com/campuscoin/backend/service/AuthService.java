@@ -30,9 +30,11 @@ public class AuthService {
     private final EmailService emailService;
     private static final int MAX_OTP_ATTEMPTS = 5;
     private final OtpService otpService;
+    private final StudentActivityService studentActivityService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
-                       AdminRepository adminRepository, OtpRepository otpRepository, EmailService emailService, OtpService otpService) {
+                       PasswordResetTokenRepository tokenRepository, AdminRepository adminRepository,
+                        OtpRepository otpRepository, EmailService emailService, OtpService otpService, StudentActivityService studentActivityService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -40,6 +42,7 @@ public class AuthService {
         this.otpRepository = otpRepository;
         this.emailService = emailService;
         this.otpService = otpService;
+        this.studentActivityService = studentActivityService;
     }
 
     public SignupResponse signup(SignupRequest request){
@@ -49,12 +52,13 @@ public class AuthService {
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = new User(
-                request.getName(),
-                request.getEmail(),
+                request.getName().trim(),
+                request.getEmail().trim().toLowerCase(),
                 hashedPassword,
-                request.getAcademicYear(),
+                request.getAcademicYear() == null ? null : request.getAcademicYear().trim(),
                 request.getMonthlySavingsGoal()
         );
+        user.setMonthlyIncome(request.getMonthlyIncome());
 
         userRepository.save(user);
         return new SignupResponse(user);
@@ -93,6 +97,8 @@ public class AuthService {
 
         user.setLastVisited(LocalDateTime.now());
         userRepository.save(user);
+
+        studentActivityService.recordActivity(user.getUserId());
 
         String token  = jwtService.generateToken(user);
         return new LoginResponse(token, user);

@@ -1,12 +1,10 @@
 package com.campuscoin.backend.controller;
 
-import com.campuscoin.backend.dto.CreateNotificationRequest;
-import com.campuscoin.backend.dto.NotificationResponse;
-import com.campuscoin.backend.dto.UpdateNotificationRequest;
-import com.campuscoin.backend.dto.UserResponse;
+import com.campuscoin.backend.dto.*;
 import com.campuscoin.backend.dto.category.CategoryResponse;
 import com.campuscoin.backend.dto.category.CreateCategoryRequest;
 import com.campuscoin.backend.dto.category.UpdateCategoryRequest;
+import com.campuscoin.backend.service.AdminAuditLogService;
 import com.campuscoin.backend.service.AdminService;
 import com.campuscoin.backend.service.CategoryService;
 import jakarta.validation.Valid;
@@ -24,10 +22,13 @@ public class AdminController {
     private final CategoryService categoryService;
 
     private final AdminService adminService;
+    private final AdminAuditLogService auditLogService;
 
-    public AdminController(CategoryService categoryService, AdminService adminService) {
+
+    public AdminController(CategoryService categoryService, AdminService adminService, AdminAuditLogService auditLogService, AdminAuditLogService auditLogService1) {
         this.categoryService = categoryService;
         this.adminService = adminService;
+        this.auditLogService = auditLogService1;
     }
 
     @GetMapping("/categories")
@@ -147,9 +148,27 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/users/{userId}/activate")
+    public ResponseEntity<Void> activateUser(
+            @PathVariable String userId
+    ) {
+
+        adminService.activateUser(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/users")
     public List<UserResponse> getAllUsers() {
 
         return adminService.getAllUsers();
+    }
+
+    @GetMapping("/audit-logs/recent")
+    public ResponseEntity<List<AdminAuditLogResponse>> getRecentAuditLogs() {
+
+        return ResponseEntity.ok(
+                auditLogService.getRecentActivity()
+        );
     }
 }

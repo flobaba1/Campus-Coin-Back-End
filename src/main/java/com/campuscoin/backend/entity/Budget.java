@@ -4,9 +4,23 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "budgets")
+@Table(
+        name = "budgets",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_budget_user_category_month_year",
+                        columnNames = {
+                                "user_id",
+                                "category_id",
+                                "month",
+                                "year"
+                        }
+                )
+        }
+)
 public class Budget {
 
     @Id

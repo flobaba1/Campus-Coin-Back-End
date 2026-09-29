@@ -70,6 +70,21 @@ public class User {
     )
     private BigDecimal monthlyIncome = BigDecimal.ZERO;
 
+    /**
+     * Profile photo is stored directly in the users table.
+     * @Lob is required so Hibernate maps the byte array to a suitable
+     * binary large object instead of a normal VARBINARY column.
+     */
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "profile_photo")
+    @JsonIgnore
+    private byte[] profilePhoto;
+
+    @Column(name = "profile_photo_content_type", length = 100)
+    @JsonIgnore
+    private String profilePhotoContentType;
+
     @Column(
             name = "created_at",
             nullable = false,
@@ -124,6 +139,10 @@ public class User {
 
         if (monthlySavingsGoal == null) {
             monthlySavingsGoal = BigDecimal.ZERO;
+        }
+
+        if (monthlyIncome == null) {
+            monthlyIncome = BigDecimal.ZERO;
         }
     }
 
@@ -191,6 +210,22 @@ public class User {
 
     public void setMonthlyIncome(BigDecimal monthlyIncome) {
         this.monthlyIncome = monthlyIncome;
+    }
+
+    public byte[] getProfilePhoto() {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto(byte[] profilePhoto) {
+        this.profilePhoto = profilePhoto;
+    }
+
+    public String getProfilePhotoContentType() {
+        return profilePhotoContentType;
+    }
+
+    public void setProfilePhotoContentType(String profilePhotoContentType) {
+        this.profilePhotoContentType = profilePhotoContentType;
     }
 
     public LocalDateTime getLastVisited() {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Map;
@@ -36,11 +37,18 @@ public class AiController {
     }
 
     @GetMapping("/category-suggestion")
-    public CategorySuggestionStructure getItems(Authentication authentication, CategorySuggestionRequest requestDTO) {
-
+    public CategorySuggestionStructure getCategorySuggestion(
+            Authentication authentication,
+            @jakarta.validation.Valid
+            @org.springframework.web.bind.annotation.ModelAttribute
+            CategorySuggestionRequest request
+    ) {
         String userId = authentication.getName();
 
-        return categorySuggestionService.generateSuggestion(userId, requestDTO);
+        return categorySuggestionService.generateSuggestion(
+                userId,
+                request
+        );
     }
 
     @GetMapping("/month-report")
