@@ -51,12 +51,13 @@ public class AuthService {
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = new User(
-                request.getName(),
-                request.getEmail(),
+                request.getName().trim(),
+                request.getEmail().trim().toLowerCase(),
                 hashedPassword,
-                request.getAcademicYear(),
+                request.getAcademicYear() == null ? null : request.getAcademicYear().trim(),
                 request.getMonthlySavingsGoal()
         );
+        user.setMonthlyIncome(request.getMonthlyIncome());
 
         userRepository.save(user);
         return new SignupResponse(user);
