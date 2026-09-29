@@ -20,12 +20,14 @@ public class AdminService {
     private final NotificationRepository notificationRepository;
 
     private final UserRepository userRepository;
+    private final AdminAuditLogService auditLogService;
 
     public AdminService(
-            NotificationRepository notificationRepository, UserRepository userRepository
+            NotificationRepository notificationRepository, UserRepository userRepository , AdminAuditLogService auditLogService
     ) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
@@ -46,6 +48,13 @@ public class AdminService {
 
         Notification savedNotification =
                 notificationRepository.save(notification);
+
+        auditLogService.record(
+                "NOTIFICATION_CREATED",
+                "NOTIFICATION",
+                savedNotification.getNotificationId(),
+                "Created notification"
+        );
 
         return new NotificationResponse(savedNotification);
     }
@@ -104,6 +113,14 @@ public class AdminService {
         Notification updatedNotification =
                 notificationRepository.save(notification);
 
+        auditLogService.record(
+                "NOTIFICATION_UPDATED",
+                "NOTIFICATION",
+                updatedNotification.getNotificationId(),
+                "Updated notification"
+        );
+
+
         return new NotificationResponse(updatedNotification);
     }
 
@@ -117,8 +134,16 @@ public class AdminService {
                                 "Notification not found"
                         )
                 );
+        String id = notification.getNotificationId();
 
         notificationRepository.delete(notification);
+
+        auditLogService.record(
+                "NOTIFICATION_DELETED",
+                "NOTIFICATION",
+                id,
+                "Deleted notification"
+        );
     }
 
     @Transactional(readOnly = true)
@@ -157,5 +182,47 @@ public class AdminService {
         user.setStatus(UserStatus.SUSPENDED);
 
         userRepository.save(user);
+        auditLogService.record(
+                "USER_SUSPENDED",
+                "USER",
+                user.getUserId(),
+                "Suspended user"
+        );
+    }
+
+
+    @Transactional
+    public void activateUser(String userId) {
+
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "User not found"
+                        )
+                );
+
+        if (user.getStatus() == UserStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "User is already active"
+            );
+        }
+
+        if (user.getStatus() == UserStatus.DEACTIVATED) {
+            throw new IllegalStateException(
+                    "Deactivated user cannot be activated"
+            );
+        }
+
+        user.setStatus(UserStatus.ACTIVE);
+
+        userRepository.save(user);
+
+        auditLogService.record(
+                "USER_ACTIVATED",
+                "USER",
+                user.getUserId(),
+                "Activated user"
+        );
     }
 }

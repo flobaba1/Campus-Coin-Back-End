@@ -31,10 +31,11 @@ public class AuthService {
     private final EmailService emailService;
     private static final int MAX_OTP_ATTEMPTS = 5;
     private final OtpService otpService;
+    private final StudentActivityService studentActivityService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
                        PasswordResetTokenRepository tokenRepository, AdminRepository adminRepository,
-                        OtpRepository otpRepository, EmailService emailService, OtpService otpService) {
+                        OtpRepository otpRepository, EmailService emailService, OtpService otpService, StudentActivityService studentActivityService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -42,6 +43,7 @@ public class AuthService {
         this.otpRepository = otpRepository;
         this.emailService = emailService;
         this.otpService = otpService;
+        this.studentActivityService = studentActivityService;
     }
 
     public SignupResponse signup(SignupRequest request){
@@ -96,6 +98,8 @@ public class AuthService {
 
         user.setLastVisited(LocalDateTime.now());
         userRepository.save(user);
+
+        studentActivityService.recordActivity(user.getUserId());
 
         String token  = jwtService.generateToken(user);
         return new LoginResponse(token, user);

@@ -14,9 +14,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final AdminAuditLogService auditLogService;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, AdminAuditLogService auditLogService) {
         this.categoryRepository = categoryRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional(readOnly = true)
@@ -94,6 +96,14 @@ public class CategoryService {
 
         Category saved = categoryRepository.save(category);
 
+        auditLogService.record(
+                "CATEGORY_CREATED",
+                "CATEGORY",
+                saved.getCategoryId(),
+                "Created category"
+        );
+
+
         return toResponse(saved);
     }
 
@@ -159,7 +169,16 @@ public class CategoryService {
         category.setName(name);
         category.setType(request.getType());
 
-        return toResponse(categoryRepository.save(category));
+        Category updated = categoryRepository.save(category);
+
+        auditLogService.record(
+                "CATEGORY_UPDATED",
+                "CATEGORY",
+                updated.getCategoryId(),
+                "Updated category"
+        );
+
+        return toResponse(updated);
     }
 
     @Transactional
@@ -197,7 +216,16 @@ public class CategoryService {
             throw new IllegalArgumentException("Category cannot be deleted, used by users");
         }
 
+
+
         categoryRepository.delete(category);
+
+        auditLogService.record(
+                "CATEGORY_DELETED",
+                "CATEGORY",
+                categoryId,
+                "Deleted category"
+        );
     }
 
     private CategoryResponse toResponse(Category category) {
