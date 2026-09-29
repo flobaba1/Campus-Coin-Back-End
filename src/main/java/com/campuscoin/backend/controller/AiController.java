@@ -48,7 +48,7 @@ public class AiController {
 
         String userId = authentication.getName();
 
-        return monthlyFinancialSummaryService.generateMonthReport(userId, 8, 2026);
+        return monthlyFinancialSummaryService.generateMonthReport(userId, 9, 2026);
     }
 
     @GetMapping("/generate-report")
