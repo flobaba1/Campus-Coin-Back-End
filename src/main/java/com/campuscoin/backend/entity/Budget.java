@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -32,13 +31,38 @@ public class Budget {
     )
     private String budgetId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "user_id",
+    @Column(
+            name = "amount",
             nullable = false,
-            foreignKey = @ForeignKey(name = "fk_budget_user")
+            precision = 15,
+            scale = 2
     )
-    private User user;
+    private BigDecimal amount;
+
+    @Column(
+            name = "created_at",
+            nullable = false,
+            updatable = false
+    )
+    private LocalDateTime createdAt;
+
+    @Column(
+            name = "month",
+            nullable = false
+    )
+    private int month;
+
+    @Column(
+            name = "updated_at",
+            nullable = false
+    )
+    private LocalDateTime updatedAt;
+
+    @Column(
+            name = "year",
+            nullable = false
+    )
+    private int year;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -49,49 +73,31 @@ public class Budget {
     private Category category;
 
     @Column(
-            name = "amount",
-            nullable = false,
-            precision = 15,
-            scale = 2
-    )
-    private BigDecimal amount;
-
-    @Column(
-            name = "month",
+            name = "user_id",
+            length = 36,
             nullable = false
     )
-    private Integer month;
+    private String userId;
 
-    @Column(
-            name = "year",
-            nullable = false
-    )
-    private Integer year;
+    public Budget() {
+    }
 
-    @Column(
-            name = "created_at",
-            nullable = false,
-            updatable = false
-    )
-    private LocalDateTime createdAt;
-
-    @Column(
-            name = "updated_at",
-            nullable = false
-    )
-    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         if (budgetId == null) {
-            budgetId = UUID.randomUUID().toString();
+            budgetId = java.util.UUID.randomUUID().toString();
         }
+
+        LocalDateTime now = LocalDateTime.now();
 
         if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+            createdAt = now;
         }
 
-        updatedAt = LocalDateTime.now();
+        if (updatedAt == null) {
+            updatedAt = now;
+        }
     }
 
     @PreUpdate
@@ -109,44 +115,12 @@ public class Budget {
         this.budgetId = budgetId;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     public BigDecimal getAmount() {
         return amount;
     }
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
-    }
-
-    public Integer getMonth() {
-        return month;
-    }
-
-    public void setMonth(Integer month) {
-        this.month = month;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -157,11 +131,43 @@ public class Budget {
         this.createdAt = createdAt;
     }
 
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
